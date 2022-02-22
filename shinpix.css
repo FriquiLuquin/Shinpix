@@ -24,7 +24,7 @@ hr {
 
 .tile {
     /* Box */
-    background-color: lightblue;
+    background-color: #ecf4f7;
     border-radius: 3px;
     /*border: 2px solid grey;*/
     width: 30px;
@@ -40,11 +40,11 @@ hr {
 }
 
 .off {
-    background-color: white;
+    background-color: #ecf4f7;
     color: black;
 }
 
 .on {
-    background-color: black;
+    background-color: #273e49;
     color: white;
 }
