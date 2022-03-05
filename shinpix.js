@@ -4,42 +4,69 @@ const cols = 16;
 var score = 0;
 var targetScore = 0;
 var gameOver = false;
-const image = new Array();
-const board = new Array();
+var board;
 
 window.onload = function(){
-    initialize();
+    setupBoard();
 }
 
-function initialize(){
+function setupBoard(){
+    // Read puzzle image
+    // image = readImage();
     // Create the game board
+    board = createEmptyBoard(rows, cols);
     for (let r = 0; r < rows; r++){
         for(let c = 0; c < cols; c++){
-            let tile = document.createElement("div");
-            tile.id = r.toString() + "-" + c.toString();
-            tile.classList.add("tile", "off");
-            tile.innerText = "0";
-            tile.addEventListener("click", (e) => {
-            // document.addEventListener("DOMContentLoaded", (e) => {
-                if (gameOver) return;
-                changeColor(tile);
-                //helloWorld(tile);
-            });
-            document.getElementById("board").appendChild(tile);
+            elem = createBoardElement(r, c);
+            // board[r][c] = new Cell();
         }
     }
 }
 
-function changeColor(tile){
-    if (tile.classList.contains("off")){
-        tile.classList.remove("off");
-        tile.classList.add("on");
+function readImage(){
+    var canvas = document.createElement("canvas");
+    canvas.height = 100;
+    canvas.width = 100;
+    canvas.style = "border: 1px solid";
+    document.getElementsByTagName("body")[0].appendChild(canvas);
+    var ctx = canvas.getContext("2d");
+    var img = new Image();
+    img.src = "./images/Shinpix01.png";
+    ctx.drawImage(img, 0, 0);
+    return canvas;
+}
+
+function createEmptyBoard(rows, cols){
+    let arr = new Array(rows);
+    for (let i = 0; i < arr.length; i++){
+        arr[i] = new Array(cols);
+    }
+    return arr;
+}
+
+function createBoardElement(row, col){
+    let elem = document.createElement("div");
+    elem.id = row.toString() + "-" + col.toString();
+    elem.classList.add("cell", "off");
+    elem.innerText = "0";
+    elem.addEventListener("click", (e) => {
+        if (gameOver) return;
+        changeColor(elem);
+    });
+    document.getElementById("board").appendChild(elem);
+    return elem;
+}
+
+function changeColor(elem){
+    if (elem.classList.contains("off")){
+        elem.classList.remove("off");
+        elem.classList.add("on");
     } else {
-        tile.classList.remove("on");
-        tile.classList.add("off");
+        elem.classList.remove("on");
+        elem.classList.add("off");
     }
 }
 
-function helloWorld(tile){
-    console.log(tile.id);
+function helloWorld(elem){
+    console.log(elem.id);
 }

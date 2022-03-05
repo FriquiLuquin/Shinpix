@@ -27,7 +27,7 @@ hr {
     border-radius: 3px;
 }
 
-.tile {
+.cell {
     /* Box */
     border-radius: 3px;
     width: 32px;
