@@ -12,28 +12,28 @@ window.onload = function(){
 
 function setupBoard(){
     // Read puzzle image
-    // image = readImage();
+    var image = readImage();
     // Create the game board
     board = createEmptyBoard(rows, cols);
     for (let r = 0; r < rows; r++){
         for(let c = 0; c < cols; c++){
-            elem = createBoardElement(r, c);
-            // board[r][c] = new Cell();
+            let state = false;
+            let correctState = image[((r * cols) + c) * 4] == 0;
+            let clue = calculateCellClue(image, r, c);
+            let elem = createBoardElement(r, c, clue);
+            // let color = getCellColor(image, r, c);
+            board[r][c] = new Cell(state, correctState, clue, elem);
         }
     }
 }
 
 function readImage(){
-    var canvas = document.createElement("canvas");
-    canvas.height = 100;
-    canvas.width = 100;
-    canvas.style = "border: 1px solid";
-    document.getElementsByTagName("body")[0].appendChild(canvas);
-    var ctx = canvas.getContext("2d");
-    var img = new Image();
-    img.src = "./images/Shinpix01.png";
-    ctx.drawImage(img, 0, 0);
-    return canvas;
+    canvas = document.querySelector("canvas");
+    image = document.querySelector("img");
+    ctx = canvas.getContext("2d");
+    ctx.drawImage(image, 0, 0);
+    data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    return data;
 }
 
 function createEmptyBoard(rows, cols){
@@ -44,15 +44,41 @@ function createEmptyBoard(rows, cols){
     return arr;
 }
 
-function createBoardElement(row, col){
+function calculateCellClue(image, r, c){
+    let clue = 0;
+    // Count neighbours that must be on
+    if (image[(((r-1) * cols) + (c-1)) * 4] == 0 && r>0 && c>0) { clue++; };
+    if (image[(((r-1) * cols) + (c  )) * 4] == 0 && r>0) { clue++; };
+    if (image[(((r-1) * cols) + (c+1)) * 4] == 0 && r>0 && c<cols-1) { clue++; };
+    if (image[(((r  ) * cols) + (c-1)) * 4] == 0 && c>0) { clue++; };
+    if (image[(((r  ) * cols) + (c+1)) * 4] == 0 && c<cols-1) { clue++; };
+    if (image[(((r+1) * cols) + (c-1)) * 4] == 0 && r<rows-1 && c>0) { clue++; };
+    if (image[(((r+1) * cols) + (c  )) * 4] == 0 && r<rows-1) { clue++; };
+    if (image[(((r+1) * cols) + (c+1)) * 4] == 0 && r<rows-1 && c<cols-1) { clue++; };
+    return clue;
+}
+
+function getCellColor(image, row, col){
+    let r = image[((row * cols) + col) * 4];
+    let g = image[((row * cols) + col) * 4 + 1];
+    let b = image[((row * cols) + col) * 4 + 2];
+}
+
+function createBoardElement(row, col, clue){
     let elem = document.createElement("div");
     elem.id = row.toString() + "-" + col.toString();
     elem.classList.add("cell", "off");
-    elem.innerText = "0";
+    elem.innerText = clue.toString();
     elem.addEventListener("click", (e) => {
         if (gameOver) return;
         changeColor(elem);
     });
+    elem.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        if (!gameOver)
+            changeMark(elem);
+        return false;
+    }, false);
     document.getElementById("board").appendChild(elem);
     return elem;
 }
@@ -65,6 +91,15 @@ function changeColor(elem){
         elem.classList.remove("on");
         elem.classList.add("off");
     }
+}
+
+function changeMark(elem){
+    if (elem.classList.contains("marked")){
+        elem.classList.remove("marked")
+    } else {
+        elem.classList.add("marked");
+    }
+    return false;
 }
 
 function helloWorld(elem){

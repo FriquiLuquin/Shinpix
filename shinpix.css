@@ -57,3 +57,7 @@ hr {
     /* border: 1px solid;
     border-color: #9E81B9 #232139 #232139 #9E81B9; */
 }
+
+div.marked {
+    border: 1px solid #d8ac1d;
+}

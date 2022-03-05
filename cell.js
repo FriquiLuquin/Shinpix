@@ -1,6 +1,13 @@
 // Cell class
 
 // Constructors
+function Cell(state, correctState, clue, elem){
+    this.state = state;
+    this.correctState = correctState;
+    this.clue = clue;
+    this.elem = elem;
+}
+
 function Cell(state, correctState, clue, elem, color){
     this.state = state;
     this.correctState = correctState;
