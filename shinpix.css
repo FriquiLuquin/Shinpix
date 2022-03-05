@@ -13,26 +13,29 @@ hr {
 }
 
 #board {
-    width: 512px; /* 30px * 16 cells + 32px margin*/
-    height: 512px;
+    width: 608px;
+    height: 608px;
+    /* width: 90vh; */
+    /* height: 90vh; */
     margin: 0 auto;
-    margin-top: 10px;
+    margin-top: 16px;
 
-    display: flex;
-    flex-wrap: wrap;
+    /* display: flex;
+    flex-wrap: wrap; */
+    display: grid;
+    grid-template-columns: repeat(16, auto);
+    border-radius: 3px;
 }
 
 .tile {
     /* Box */
-    background-color: #ecf4f7;
     border-radius: 3px;
-    /*border: 2px solid grey;*/
-    width: 30px;
-    height: 30px;
-    margin: 1px;
+    width: 32px;
+    height: 32px;
+    /* width: 1/16%;
+    height: 1/16%; */
 
     /* Text */
-    color: black;
     font-size: 20px;
     display: flex;
     justify-content: center;
@@ -40,11 +43,17 @@ hr {
 }
 
 .off {
-    background-color: #ecf4f7;
-    color: black;
+    color: #273e49;
+    background-color: white;
+    border: 1px solid #273e49;
+    /* background-color: #EDC367;
+    border-color: #e6d2a2 #866A55 #866A55 #e6d2a2; */
 }
 
 .on {
-    background-color: #273e49;
     color: white;
+    background-color: #273e49;
+    border: 1px solid #273e49;
+    /* border: 1px solid;
+    border-color: #9E81B9 #232139 #232139 #9E81B9; */
 }
