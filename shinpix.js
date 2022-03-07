@@ -4,21 +4,25 @@ const cols = 16;
 var score = 0;
 var targetScore = 0;
 var gameOver = false;
+var colorImage;
 var image;
 var board;
 
 window.onload = function(){
     image = readImage();
+    // colorImage = readImage();
     board = createEmptyBoard(rows, cols);
     populateBoard(board, image);
 }
 
 function readImage(){
-    canvas = document.querySelector("canvas");
-    img = document.querySelector("img");
-    ctx = canvas.getContext("2d");
+    let canvas = document.querySelector("canvas");
+    let img = document.querySelector("img");
+    let ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
-    data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    document.querySelector("body").removeChild(canvas);
+    document.querySelector("body").removeChild(img);
     return data;
 }
 
@@ -80,7 +84,10 @@ function addClickEventsTo(elem, row, col){
     // Add left and right click listeners
     elem.addEventListener("click", () => leftClickManager(row, col, elem));
     elem.addEventListener('contextmenu', (e) => {
-        rightClickManager(e, elem)
+        e.preventDefault();
+        if (!gameOver)
+            changeMark(elem);
+        return false;
     }, false);
 }
 
@@ -90,13 +97,6 @@ function leftClickManager(row, col, elem){
     changeState(row, col);
     updateScore(row, col);
     checkForGameOver();
-}
-
-function rightClickManager(e, elem){
-    e.preventDefault();
-    if (!gameOver)
-        changeMark(elem);
-    return false;
 }
 
 function changeColor(elem){
