@@ -3,40 +3,42 @@ body {
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
-hr {
-    width: 500px;
-}
-
 #title {
-    font-size: 32px;
-    margin: 12px;
+    color: #273e49;
+    font-size: 40px;
+    margin: 20px;
 }
 
 #board {
-    width: 608px;
-    height: 608px;
-    /* width: 90vh; */
-    /* height: 90vh; */
+    width: fit-content; /*608px;*/
+    height: fit-content; /*608px;*/
+    background-color: white;
+    border: 1px solid #273e49;
+    border-radius: 7px;
+    padding: 4px;
     margin: 0 auto;
     margin-top: 16px;
+    /* width: 90vh; */
+    /* height: 90vh; */
 
     /* display: flex;
     flex-wrap: wrap; */
     display: grid;
     grid-template-columns: repeat(16, auto);
-    border-radius: 3px;
 }
 
-.cell {
+.tile {
     /* Box */
+    width: 40px;
+    height: 40px;
+    margin: 2px;
     border-radius: 3px;
-    width: 32px;
-    height: 32px;
+
     /* width: 1/16%;
     height: 1/16%; */
 
     /* Text */
-    font-size: 20px;
+    font-size: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
