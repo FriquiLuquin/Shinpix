@@ -74,20 +74,20 @@ div.marked {
 
 @keyframes flip-in {
     from {
-        transform: rotateY(0);
+        transform: rotateY(0) scale(100%);
     }
 
     to {
-        transform: rotateY(90deg);
+        transform: rotateY(90deg) scale(110%);
     }
 }
 
 @keyframes flip-out {
     from {
-        transform: rotateY(90deg);
+        transform: rotateY(90deg) scale(110%);
     }
     
     to {
-        transform: rotateY(0);
+        transform: rotateY(0) scale(100%);
     }
 }

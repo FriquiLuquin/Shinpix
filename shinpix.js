@@ -165,7 +165,7 @@ function showBoardColors(){
             setTimeout(() => {
                 let elem = board[r][c].elem;
                 flipTile(elem, () => showTileColor(r, c, elem));
-            }, (r+c)*200)
+            }, (r+c)*100)
         }
     }
 }
