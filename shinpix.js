@@ -9,29 +9,26 @@ var image;
 var board;
 
 window.onload = function(){
-    image = readImage("shinpix");
-    colorImage = readImage("answer");
-    removeCanvasAndImages("shinpix", "answer");
+    numero = Math.floor(Math.random() * 5) + 1;
+    image = readImage("shinpix", numero);
+    colorImage = readImage("answer", numero);
+    removeImages();
     board = createEmptyBoard(rows, cols);
     populateBoard(board, image, colorImage);
 }
 
-function readImage(id){
+function readImage(id, numero){
     let canvas = document.querySelector("canvas");
-    let img = document.getElementById(id);
+    let img = document.getElementById(id+"0"+numero);
     let ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
     let data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     return data;
 }
 
-function removeCanvasAndImages(id1, id2){
-    let canvas = document.querySelector("canvas");
-    document.querySelector("body").removeChild(canvas);
-    let img1 = document.getElementById(id1);
-    document.querySelector("body").removeChild(img1);
-    let img2 = document.getElementById(id2);
-    document.querySelector("body").removeChild(img2);
+function removeImages(){
+    let img = document.getElementById("images");
+    document.querySelector("body").removeChild(img);
 }
 
 function createEmptyBoard(rows, cols){
