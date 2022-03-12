@@ -1,20 +1,27 @@
-const rows = 16;
-const cols = 16;
+// Board class
 
-var score = 0;
-var targetScore = 0;
-var gameOver = false;
-var colorImage;
-var image;
-var board;
+// Constructor
+function Board(rows, cols, image, colorImage, grid){
+    this.rows = rows;
+    this.cols = cols;
+    this.score = 0;
+    this.targetScore = 0;
+    this.gameOver = false;
+    this.image = image;
+    this.colorImage = colorImage;
+    this.grid = grid;
+}
 
 window.onload = function(){
-    numero = Math.floor(Math.random() * 5) + 1;
-    image = readImage("shinpix", numero);
-    colorImage = readImage("answer", numero);
+    const rows = 16;
+    const cols = 16;
+    const numero = Math.floor(Math.random() * 5) + 1;
+    const image = readImage("shinpix", numero);
+    const colorImage = readImage("answer", numero);
     removeImages();
-    board = createEmptyBoard(rows, cols);
-    populateBoard(board, image, colorImage);
+    var grid = createEmptyGrid(rows, cols);
+    var board = new Board(rows, cols, image, colorImage, grid);
+    populateBoard(board);
 }
 
 function readImage(id, numero){
@@ -31,7 +38,7 @@ function removeImages(){
     document.querySelector("body").removeChild(img);
 }
 
-function createEmptyBoard(rows, cols){
+function createEmptyGrid(rows, cols){
     let arr = new Array(rows);
     for (let i = 0; i < rows; i++){
         arr[i] = new Array(cols);
@@ -39,29 +46,29 @@ function createEmptyBoard(rows, cols){
     return arr;
 }
 
-function populateBoard(board, image, colorImage){
-    for (let r = 0; r < rows; r++){
-        for(let c = 0; c < cols; c++){
+function populateBoard(board){
+    for (let r = 0; r < board.rows; r++){
+        for(let c = 0; c < board.cols; c++){
             let state = false;
             let correctState = false;
-            if (isPixelBlack(image, r, c)){
+            if (isPixelBlack(board.image, r, c, board.cols)){
                 correctState = true;
-                targetScore++;
+                board.targetScore++;
             }
-            let clue = calculateTileClue(image, r, c);
+            let clue = calculateTileClue(board.image, r, c, board.rows, board.cols);
             let elem = createBoardElement(r, c, clue);
-            addClickEventsTo(elem, r, c);
-            let color = getImageColor(colorImage, r, c);
-            board[r][c] = new Tile(state, correctState, clue, elem, color);
+            addClickEventsTo(elem, r, c, board);
+            let color = getImageColor(board.colorImage, r, c, board.cols);
+            board.grid[r][c] = new Tile(state, correctState, clue, elem, color);
         }
     }
 }
 
-function isPixelBlack(image, r, c){
+function isPixelBlack(image, r, c, cols){
     return image[((r * cols) + c) * 4] == 0
 }
 
-function calculateTileClue(image, r, c){
+function calculateTileClue(image, r, c, rows, cols){
     let clue = 0;
     // Count neighbours that must be on
     if (image[(((r-1) * cols) + (c-1)) * 4] == 0 && r>0 && c>0) { clue++; };
@@ -85,30 +92,30 @@ function createBoardElement(row, col, clue){
     return elem;
 }
 
-function addClickEventsTo(elem, row, col){
+function addClickEventsTo(elem, row, col, board){
     // Add left and right click listeners
-    elem.addEventListener("click", () => leftClickManager(row, col, elem));
-    elem.addEventListener('contextmenu', (e) => { rightClickManager(e, elem); }, false);
+    elem.addEventListener("click", () => leftClickManager(row, col, elem, board));
+    elem.addEventListener('contextmenu', (e) => { rightClickManager(e, elem, board); }, false);
 }
 
-function getImageColor(image, row, col){
+function getImageColor(image, row, col, cols){
     let r = image[((row * cols) + col) * 4];
     let g = image[((row * cols) + col) * 4 + 1];
     let b = image[((row * cols) + col) * 4 + 2];
     return rgbToHex(r, g, b);
 }
 
-function leftClickManager(row, col, elem){
-    if (gameOver) return;
+function leftClickManager(row, col, elem, board){
+    if (board.gameOver) return;
     flipTile(elem, () => changeColor(elem));
-    changeState(row, col);
-    updateScore(row, col);
-    checkForGameOver();
+    changeState(board.grid, row, col);
+    updateScore(board, row, col);
+    checkForGameOver(board);
 }
 
-function rightClickManager(e, elem){
+function rightClickManager(e, elem, board){
     e.preventDefault();
-    if (!gameOver)
+    if (!board.gameOver)
         changeMark(elem);
     return false;
 }
@@ -136,39 +143,39 @@ function changeColor(elem){
     }
 }
 
-function changeState(row, col){
-    board[row][col].state = !board[row][col].state;
+function changeState(grid, row, col){
+    grid[row][col].state = !grid[row][col].state;
 }
 
-function updateScore(row, col){
-    if (board[row][col].state == board[row][col].correctState){
-        score++;
+function updateScore(board, row, col){
+    if (board.grid[row][col].state == board.grid[row][col].correctState){
+        board.score++;
     }
     else {
-        score--;
+        board.score--;
     }
 }
 
-function checkForGameOver(){
-    if (score == targetScore){
-        gameOver = true;
-        showBoardColors();
+function checkForGameOver(board){
+    if (board.score == board.targetScore){
+        board.gameOver = true;
+        showBoardColors(board);
     }
 }
 
-function showBoardColors(){
-    for (let r = 0; r < rows; r++){
-        for(let c = 0; c < cols; c++){
+function showBoardColors(board){
+    for (let r = 0; r < board.rows; r++){
+        for(let c = 0; c < board.cols; c++){
             setTimeout(() => {
-                let elem = board[r][c].elem;
-                flipTile(elem, () => showTileColor(r, c, elem));
+                let elem = board.grid[r][c].elem;
+                flipTile(elem, () => showTileColor(r, c, elem, board.grid));
             }, (r+c)*100)
         }
     }
 }
 
-function showTileColor(row, col, elem){
-    let color = board[row][col].color;
+function showTileColor(row, col, elem, grid){
+    let color = grid[row][col].color;
     elem.innerText = "";
     elem.classList.remove("on", "off", "marked");
     let answerStyle = "background-color: " + color + "; border: 1px solid " + color + ";";
