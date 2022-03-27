@@ -34,7 +34,7 @@ function readImage(id, numero){
 }
 
 function removeImages(){
-    let img = document.getElementById("images");
+    let img = document.getElementById("puzzles");
     document.querySelector("body").removeChild(img);
 }
 
