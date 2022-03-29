@@ -6,6 +6,7 @@
         <title>Shinpix - Pixelart logic puzzles</title>
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="tutorial.css">
         <script src="tile.js"></script>
         <script src="board.js"></script>
     </head>
@@ -14,6 +15,7 @@
         <div id="board">
             
         </div>
+
         <div id="puzzles" hidden>
             <img id="shinpix01" src="./puzzles/shinpix01.png" alt="imagen del puzle" >
             <img id="answer01" src="./puzzles/answer01.png" alt="imagen de la solucion">
@@ -26,6 +28,27 @@
             <img id="shinpix05" src="./puzzles/shinpix05.png" alt="imagen del puzle" >
             <img id="answer05" src="./puzzles/answer05.png" alt="imagen de la solucion">
             <canvas width="16" height="16" style="border: 1px solid;" ></canvas>
+        </div>
+
+        <div id="tutorial">
+            <div class="modal-container" id="modal-container">
+                <div class="modal">
+                    <h2>How to play</h2>
+                    <p>A mysterious pixelart image is hidden behind this grid and you have to find it.</p>
+                    <p>The rules are very similar to Minesweeper:</p>
+                    <ul>
+                        <li>You can activate a tile by clicking it</li>
+                        <li>Some tiles must be activated. They will reveal the hidden image</li>
+                        <li>The rest must reamin disabled</li>
+                        <li>Each tile has 8 neighbours surrounding it</li>
+                        <li>The number inside each tile tells you how many activated neighbours the tile must have</li>
+                        <li>Your task is to use these clues to deduce and activate all the correct tiles</li>
+                    </ul>
+                    <p>Some examples with recurrent patterns:</p>
+            
+                    <button id="close">Got it!</button>
+                </div>
+            </div>
         </div>
     </body>
 </html>

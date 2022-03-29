@@ -1,9 +1,9 @@
 body {
-    text-align: center;
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 #title {
+    text-align: center;
     color: #273e49;
     font-size: 40px;
     margin: 20px;
