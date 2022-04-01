@@ -1,6 +1,5 @@
 .modal {
     font-size: 18px;
-    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     color: rgba(0, 0, 0, 0.7);
     background-color: white;
     width: 640px;
@@ -24,6 +23,34 @@
     left: 0;
 }
 
-h2 {
+.centered-header {
     text-align: center;
+}
+
+.example-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+.example {
+    background-color: red;
+    width: 100px;
+    height: 100px;
+}
+
+.button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button {
+    background-color: #273e49;
+    border: 0;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }

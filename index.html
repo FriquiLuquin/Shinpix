@@ -33,20 +33,26 @@
         <div id="tutorial">
             <div class="modal-container" id="modal-container">
                 <div class="modal">
-                    <h2>How to play</h2>
-                    <p>A mysterious pixelart image is hidden behind this grid and you have to find it.</p>
-                    <p>The rules are very similar to Minesweeper:</p>
+                    <h2 class="centered-header">How to play Shinpix</h2>
+                    <p>A mysterious pixelart image is hidden in this grid and you have to find it.
+                    Activate all the correct tiles to reveal the secret image.</p>
+                    <h3 class="centered-header">Rules</h3>
                     <ul>
-                        <li>You can activate a tile by clicking it</li>
-                        <li>Some tiles must be activated. They will reveal the hidden image</li>
-                        <li>The rest must reamin disabled</li>
-                        <li>Each tile has 8 neighbours surrounding it</li>
-                        <li>The number inside each tile tells you how many activated neighbours the tile must have</li>
-                        <li>Your task is to use these clues to deduce and activate all the correct tiles</li>
+                        <li>Click a tile to flip it. This will activate or deactivate it</li>
+                        <li>Each tile has neighbours: 3 (corner), 5 (border) or 8 (the rest)</li>
+                        <li>Each tile indicates how many of those neighbours must be activated</li>
+                        <li>Use Minesweeper logic to deduce and activate all the correct tiles</li>
                     </ul>
-                    <p>Some examples with recurrent patterns:</p>
-            
-                    <button id="close">Got it!</button>
+                    <h3 class="centered-header">Examples</h3>
+                    <div class="example-container">
+                        <div class="example"></div>
+                        <div class="example"></div>
+                        <div class="example"></div>
+                        <div class="example"></div>
+                    </div>
+                    <div class="button-container">
+                        <button class="button" id="close">Got it!</button>
+                    </div>
                 </div>
             </div>
         </div>
