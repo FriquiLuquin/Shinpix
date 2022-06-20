@@ -2,7 +2,8 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=0, user-scalable=no">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Shinpix - Pixelart logic puzzles</title>
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="styles.css">
@@ -33,28 +34,49 @@
         <div id="tutorial">
             <div class="modal-container" id="modal-container">
                 <div class="modal">
-                    <h2 class="centered-header">How to play Shinpix</h2>
-                    <p>A mysterious pixelart image is hidden in this grid and you have to find it.
-                    Activate all the correct tiles to reveal the secret image.</p>
-                    <h3 class="centered-header">Rules</h3>
-                    <ul>
-                        <li>Click a tile to flip it. This will activate or deactivate it</li>
-                        <li>Each tile has neighbours: 3 (corner), 5 (border) or 8 (the rest)</li>
-                        <li>Each tile indicates how many of those neighbours must be activated</li>
-                        <li>Use Minesweeper logic to deduce and activate all the correct tiles</li>
+                    <p>How to play Shinpix</p>
+
+                    <div class="rule-container">
+                        <div class="rule" id="rule1">
+                            <p>Click a tile to flip it.</p>
+                            <div class="rule-board">
+
+                            </div>
+                        </div>
+                        <div class="rule" id="rule2">
+                            <p>Each tile has 3, 5 or 8 neighbours</p>
+                            <div class="rule-board">
+
+                            </div>
+                        </div>
+                        <div class="rule" id="rule3">
+                            <p>The numbers indicate how many of those neighbours must be fliped</p>
+                            <div class="rule-board">
+
+                            </div>
+                        </div>
+                        <div class="rule" id="rule4">
+                            <p>Flip the tiles to their correct position to reveal the secret image.</p>
+                            <div class="rule-board">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="tutorial-menu">
+                        <li><a href="#rule1">1</a></li>
+                        <li><a href="#rule2">2</a></li>
+                        <li><a href="#rule3">3</a></li>
+                        <li><a href="#rule4">4</a></li>
                     </ul>
-                    <h3 class="centered-header">Examples</h3>
-                    <div class="example-container">
-                        <div class="example"></div>
-                        <div class="example"></div>
-                        <div class="example"></div>
-                        <div class="example"></div>
-                    </div>
-                    <div class="button-container">
+
+                    <!-- <div class="button-container">
                         <button class="button" id="close">Got it!</button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
+
+        <script src="tutorial.js"></script>
     </body>
 </html>

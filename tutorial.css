@@ -4,9 +4,11 @@
     background-color: white;
     width: 640px;
     max-width: 100%;
+    height: 500px;
+    max-height: 100%;
     padding: 10px 30px 30px 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
 }
 
 .modal-container {
@@ -23,19 +25,8 @@
     left: 0;
 }
 
-.centered-header {
+.modal p {
     text-align: center;
-}
-
-.example-container {
-    display: flex;
-    justify-content: space-around;
-}
-
-.example {
-    background-color: red;
-    width: 100px;
-    height: 100px;
 }
 
 .button-container {
@@ -48,9 +39,32 @@
     background-color: #273e49;
     border: 0;
     border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
     color: white;
     padding: 10px 20px;
     font-size: 18px;
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.rule-board {
+    width: fit-content;
+    height: fit-content;
+    background-color: white;
+    border: 1px solid #273e49;
+    border-radius: 7px;
+    padding: 4px;
+    margin: 0 auto;
+    margin-top: 16px;
+
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+}
+
+ul.tutorial-menu li {
+    list-style: none;
+    
+}
+
+div.rule-container {
+    position: relative;
 }
