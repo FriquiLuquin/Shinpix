@@ -8,6 +8,7 @@ function Board(rows, cols, image, colorImage, grid){
     this.cols = cols;
     this.score = 0;
     this.targetScore = 0;
+    this.strikes = 0;
     this.gameOver = false;
     this.image = image;
     this.colorImage = colorImage;
@@ -15,21 +16,21 @@ function Board(rows, cols, image, colorImage, grid){
 }
 
 window.onload = function(){
-    const selectedImage = selectRandomImage(jsonData);
-    processImage(selectedImage);
+    const selectedPuzzle = selectRandomPuzzle(jsonPuzzleData);
+    processPuzzle(selectedPuzzle);
 }
 
-function selectRandomImage(jsonData) {
-    const puzzles = jsonData.puzzles;
+function selectRandomPuzzle(jsonPuzzleData) {
+    const puzzles = jsonPuzzleData.puzzles;
     const randomIndex = Math.floor(Math.random() * puzzles.length);
     return puzzles[randomIndex];
 }
 
-function processImage(imageData) {
-    console.log("Processing image with dimensions:", imageData.width, "x", imageData.height);
-    console.log(imageData.pixels);
-    var grid = createEmptyGrid(rows, cols);
-    var board = new Board(rows, cols, imageData.pixels, imageData.pixels, grid);
+function processPuzzle(puzzleData) {
+    console.log("Processing image with dimensions:", puzzleData.width, "x", puzzleData.height);
+    console.log(puzzleData.pixels);
+    var grid = createEmptyGrid(puzzleData.height, puzzleData.width);
+    var board = new Board(puzzleData.height, puzzleData.width, puzzleData.pixels, puzzleData.colors, grid);
     populateBoard(board);
 }
 
@@ -54,8 +55,8 @@ function populateBoard(board){
             let clue = calculateTileClue(board.image, r, c, board.rows, board.cols);
             let elem = createBoardElement(r, c, clue);
             addClickEventsTo(elem, r, c, board);
-            // let color = getImageColor(board.colorImage, r, c, board.cols);
-            board.grid[r][c] = new Tile(revealed, goodTile, flagged, clue, elem);
+            let color = getImageColor(board.colorImage, r, c);
+            board.grid[r][c] = new Tile(revealed, goodTile, flagged, clue, elem, color);
         }
     }
     console.log(board)
@@ -97,10 +98,10 @@ function addClickEventsTo(elem, row, col, board){
     elem.addEventListener('contextmenu', (e) => { rightClickManager(e, elem, board); }, false);
 }
 
-function getImageColor(image, row, col, cols){
-    let r = image[((row * cols) + col) * 4];
-    let g = image[((row * cols) + col) * 4 + 1];
-    let b = image[((row * cols) + col) * 4 + 2];
+function getImageColor(image, row, col){
+    let r = image[row][col][0];
+    let g = image[row][col][1];
+    let b = image[row][col][2];
     return rgbToHex(r, g, b);
 }
 
