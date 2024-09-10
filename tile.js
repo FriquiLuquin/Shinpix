@@ -1,11 +1,12 @@
 // Tile class
 
 // Constructor
-function Tile(state, correctState, clue, elem, color){
-    this.state = state;
-    this.correctState = correctState;
+function Tile(revealed, goodTile, flagged, clue, elem){
+    this.revealed = revealed;
+    this.goodTile = goodTile;
+    this.flagged = flagged;
     this.clue = clue;
     this.elem = elem;
-    this.color = color;
+    //this.color = color;
 }
 

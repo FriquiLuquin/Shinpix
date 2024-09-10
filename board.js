@@ -1,4 +1,6 @@
 // Board class
+const rows = 16;
+const cols = 16;
 
 // Constructor
 function Board(rows, cols, image, colorImage, grid){
@@ -13,29 +15,22 @@ function Board(rows, cols, image, colorImage, grid){
 }
 
 window.onload = function(){
-    const rows = 16;
-    const cols = 16;
-    const numero = Math.floor(Math.random() * 5) + 1;
-    const image = readImage("shinpix", numero);
-    const colorImage = readImage("answer", numero);
-    removeImages();
+    const selectedImage = selectRandomImage(jsonData);
+    processImage(selectedImage);
+}
+
+function selectRandomImage(jsonData) {
+    const puzzles = jsonData.puzzles;
+    const randomIndex = Math.floor(Math.random() * puzzles.length);
+    return puzzles[randomIndex];
+}
+
+function processImage(imageData) {
+    console.log("Processing image with dimensions:", imageData.width, "x", imageData.height);
+    console.log(imageData.pixels);
     var grid = createEmptyGrid(rows, cols);
-    var board = new Board(rows, cols, image, colorImage, grid);
+    var board = new Board(rows, cols, imageData.pixels, imageData.pixels, grid);
     populateBoard(board);
-}
-
-function readImage(id, numero){
-    let canvas = document.querySelector("canvas");
-    let img = document.getElementById(id+"0"+numero);
-    let ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    let data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    return data;
-}
-
-function removeImages(){
-    let img = document.getElementById("puzzles");
-    document.querySelector("body").removeChild(img);
 }
 
 function createEmptyGrid(rows, cols){
@@ -49,36 +44,40 @@ function createEmptyGrid(rows, cols){
 function populateBoard(board){
     for (let r = 0; r < board.rows; r++){
         for(let c = 0; c < board.cols; c++){
-            let state = false;
-            let correctState = false;
-            if (isPixelBlack(board.image, r, c, board.cols)){
-                correctState = true;
+            let revealed = false;
+            let goodTile = false;
+            if (isGoodTile(board.image[r][c])){
+                goodTile = true;
                 board.targetScore++;
             }
+            let flagged = false;
             let clue = calculateTileClue(board.image, r, c, board.rows, board.cols);
             let elem = createBoardElement(r, c, clue);
             addClickEventsTo(elem, r, c, board);
-            let color = getImageColor(board.colorImage, r, c, board.cols);
-            board.grid[r][c] = new Tile(state, correctState, clue, elem, color);
+            // let color = getImageColor(board.colorImage, r, c, board.cols);
+            board.grid[r][c] = new Tile(revealed, goodTile, flagged, clue, elem);
         }
     }
+    console.log(board)
 }
 
-function isPixelBlack(image, r, c, cols){
-    return image[((r * cols) + c) * 4] == 0
+function isGoodTile(tile){
+    return tile[0] == 0 && tile[1] == 0 && tile[2] == 0
 }
 
 function calculateTileClue(image, r, c, rows, cols){
+    let R = rows-1;
+    let C = cols-1;
     let clue = 0;
-    // Count neighbours that must be on
-    if (image[(((r-1) * cols) + (c-1)) * 4] == 0 && r>0 && c>0) { clue++; };
-    if (image[(((r-1) * cols) + (c  )) * 4] == 0 && r>0) { clue++; };
-    if (image[(((r-1) * cols) + (c+1)) * 4] == 0 && r>0 && c<cols-1) { clue++; };
-    if (image[(((r  ) * cols) + (c-1)) * 4] == 0 && c>0) { clue++; };
-    if (image[(((r  ) * cols) + (c+1)) * 4] == 0 && c<cols-1) { clue++; };
-    if (image[(((r+1) * cols) + (c-1)) * 4] == 0 && r<rows-1 && c>0) { clue++; };
-    if (image[(((r+1) * cols) + (c  )) * 4] == 0 && r<rows-1) { clue++; };
-    if (image[(((r+1) * cols) + (c+1)) * 4] == 0 && r<rows-1 && c<cols-1) { clue++; };
+    // Count neighbours that must be revealed
+    if (r>0 && c>0 && isGoodTile(image[r-1][c-1])) { clue++; };
+    if (r>0        && isGoodTile(image[r-1][c  ])) { clue++; };
+    if (r>0 && c<C && isGoodTile(image[r-1][c+1])) { clue++; };
+    if (       c>0 && isGoodTile(image[r  ][c-1])) { clue++; };
+    if (       c<C && isGoodTile(image[r  ][c+1])) { clue++; };
+    if (r<R && c>0 && isGoodTile(image[r+1][c-1])) { clue++; };
+    if (r<R        && isGoodTile(image[r+1][c  ])) { clue++; };
+    if (r<R && c<C && isGoodTile(image[r+1][c+1])) { clue++; };
     return clue;
 }
 

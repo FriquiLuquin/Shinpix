@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to 2D RGB JSON Converter</title>
+</head>
+<body>
+
+<h1>Image to 2D RGB JSON Converter</h1>
+
+<!-- Button to open file explorer -->
+<input type="file" id="imageInput" accept="image/*">
+<br><br>
+
+<!-- Button to process the image and download JSON -->
+<button id="processButton" disabled>Convert and Download JSON</button>
+
+<!-- Hidden canvas element for pixel manipulation -->
+<canvas id="canvas" style="display: none;"></canvas>
+
+<script>
+  // Get DOM elements
+  const imageInput = document.getElementById('imageInput');
+  const processButton = document.getElementById('processButton');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let selectedImage = null;
+
+  // Event listener for image selection
+  imageInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      selectedImage = new Image();
+      selectedImage.src = URL.createObjectURL(file);
+      selectedImage.onload = function() {
+        // Enable the process button once an image is loaded
+        processButton.disabled = false;
+      };
+    }
+  });
+
+  // Event listener for processing the image and downloading JSON
+  processButton.addEventListener('click', function() {
+    if (selectedImage) {
+      // Set canvas size to match the image dimensions
+      canvas.width = selectedImage.width;
+      canvas.height = selectedImage.height;
+      ctx.drawImage(selectedImage, 0, 0);
+
+      // Get image data (RGBA values)
+      const imageData = ctx.getImageData(0, 0, selectedImage.width, selectedImage.height);
+      const pixels = imageData.data;
+
+      // Build the JSON object
+      const jsonImage = {
+        width: selectedImage.width,
+        height: selectedImage.height,
+        pixels: []
+      };
+
+      // Iterate through rows and columns to create the 2D matrix
+      for (let y = 0; y < selectedImage.height; y++) {
+        const row = [];
+        for (let x = 0; x < selectedImage.width; x++) {
+          const index = (y * selectedImage.width + x) * 4;
+          const r = pixels[index];
+          const g = pixels[index + 1];
+          const b = pixels[index + 2];
+          row.push([r, g, b]); // Push [R, G, B] values for each pixel
+        }
+        jsonImage.pixels.push(row); // Add each row to the pixels array
+      }
+
+      // Create a JSON blob and trigger download
+      const blob = new Blob([JSON.stringify(jsonImage)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'image-data-matrix.json';
+      link.click();
+    }
+  });
+</script>
+
+</body>
+</html>

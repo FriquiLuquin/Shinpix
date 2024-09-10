@@ -6,55 +6,14 @@
         <title>Shinpix - Pixelart logic puzzles</title>
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="styles.css">
-        <link rel="stylesheet" href="tutorial.css">
         <script src="tile.js"></script>
         <script src="board.js"></script>
+        <script src="puzzles.js"></script>
     </head>
     <body>
         <h1 id="title">Shinpix</h1>
         <div id="board">
             
-        </div>
-
-        <div id="puzzles" hidden>
-            <img id="shinpix01" src="./puzzles/shinpix01.png" alt="imagen del puzle" >
-            <img id="answer01" src="./puzzles/answer01.png" alt="imagen de la solucion">
-            <img id="shinpix02" src="./puzzles/shinpix02.png" alt="imagen del puzle" >
-            <img id="answer02" src="./puzzles/answer02.png" alt="imagen de la solucion">
-            <img id="shinpix03" src="./puzzles/shinpix03.png" alt="imagen del puzle" >
-            <img id="answer03" src="./puzzles/answer03.png" alt="imagen de la solucion">
-            <img id="shinpix04" src="./puzzles/shinpix04.png" alt="imagen del puzle" >
-            <img id="answer04" src="./puzzles/answer04.png" alt="imagen de la solucion">
-            <img id="shinpix05" src="./puzzles/shinpix05.png" alt="imagen del puzle" >
-            <img id="answer05" src="./puzzles/answer05.png" alt="imagen de la solucion">
-            <canvas width="16" height="16" style="border: 1px solid;" ></canvas>
-        </div>
-
-        <div id="tutorial">
-            <div class="modal-container" id="modal-container">
-                <div class="modal">
-                    <h2 class="centered-header">How to play Shinpix</h2>
-                    <p>A mysterious pixelart image is hidden in this grid and you have to find it.
-                    Activate all the correct tiles to reveal the secret image.</p>
-                    <h3 class="centered-header">Rules</h3>
-                    <ul>
-                        <li>Click a tile to flip it. This will activate or deactivate it</li>
-                        <li>Each tile has neighbours: 3 (corner), 5 (border) or 8 (the rest)</li>
-                        <li>Each tile indicates how many of those neighbours must be activated</li>
-                        <li>Use Minesweeper logic to deduce and activate all the correct tiles</li>
-                    </ul>
-                    <h3 class="centered-header">Examples</h3>
-                    <div class="example-container">
-                        <div class="example"></div>
-                        <div class="example"></div>
-                        <div class="example"></div>
-                        <div class="example"></div>
-                    </div>
-                    <div class="button-container">
-                        <button class="button" id="close">Got it!</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </body>
 </html>
