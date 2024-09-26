@@ -11,9 +11,49 @@
         <script src="puzzles.js"></script>
     </head>
     <body>
-        <h1 id="title">Shinpix</h1>
-        <div id="board">
+        <div class="game-container">
+            <div class="content-container">
+                <header class="content-container">
+                    <div id="header-row">
+                        <h1 id="shinpix">Shinpix</h1>
+                        <div id="menu">
+                            <a href="#tutorial">
+                                <img src="./images/info-button-icon-by-Freepik.png" class="icon">
+                            </a>
+                            <img src="./images/presentation-icon-by-Freepik.png" class="icon" id="helpMode">
+                            <img src="./images/calendar-icon-by-Freepik.png" class="icon">
+                        </div>
+                    </div>
+                    <div id="header-row">
+                        <div id="titles"><span id="title">000</span> - <span id="subtitle">???</span></div>
+                        <div id="game-scores">
+                            <div id="scoreboard"><span id="score">0</span>/<span id="goal">0</span></div>
+                            <div id="strikeboard"><span id="strikes">0</span>/3</div>
+                        </div>
+                    </div>
+                </header>
+                <div id="board">
             
+                </div>
+                <div id="tutorial">
+                    <p>Resuelve el puzle para revelar la imagen escondida en este tablero.</p>
+                    <p>CÓMO JUGAR:</p>
+                    <ul>
+                        <li>Haz clic izquierdo en una casilla para revelarla.</li>
+                        <li>El número en cada casilla indica cuántas de sus casillas adyacentes debes revelar.</li>
+                        <li>Deduce y revela todas las casillas correctas para ganar.</li>
+                        <li>Revela 3 casillas incorrectas y se acabó la partida.</li>
+                        <li>Marca las casillas incorrectas con el clic derecho para ayudarte.</li>
+                    </ul>
+                    <p>CONSEJOS:</p>
+                    <ul>
+                        <li>Todas las casillas adyacentes a una casilla con un 8 son correctas.</li>
+                        <li>Lo mismo sucede con las casillas con un 5 en los bordes o con un 3 en las esquinas.</li>
+                        <li>Todas las casillas adyacentes a una casilla con un 0 son incorrectas.</li>
+                        <li>Activa la Ayuda Inicial para resolver automáticamente estas casillas triviales.</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </body>
 </html>

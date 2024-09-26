@@ -17,7 +17,7 @@ function Board(rows, cols, image, colorImage, grid){
 
 window.onload = function(){
     const selectedPuzzle = selectRandomPuzzle(jsonPuzzleData);
-    processPuzzle(selectedPuzzle);
+    loadPuzzle(selectedPuzzle);
 }
 
 function selectRandomPuzzle(jsonPuzzleData) {
@@ -26,12 +26,17 @@ function selectRandomPuzzle(jsonPuzzleData) {
     return puzzles[randomIndex];
 }
 
-function processPuzzle(puzzleData) {
-    console.log("Processing image with dimensions:", puzzleData.width, "x", puzzleData.height);
+function loadPuzzle(puzzleData) {
+    console.log("loading image with dimensions:", puzzleData.width, "x", puzzleData.height);
     console.log(puzzleData.pixels);
+    document.getElementById("title").innerHTML = puzzleData.title;
+    document.getElementById("subtitle").innerHTML = puzzleData.subtitle;
     var grid = createEmptyGrid(puzzleData.height, puzzleData.width);
     var board = new Board(puzzleData.height, puzzleData.width, puzzleData.pixels, puzzleData.colors, grid);
     populateBoard(board);
+    document.getElementById("goal").innerHTML = board.targetScore;
+    console.log(board)
+    document.getElementById("helpMode").addEventListener("click", () => activateHelpMode(board));
 }
 
 function createEmptyGrid(rows, cols){
@@ -59,7 +64,6 @@ function populateBoard(board){
             board.grid[r][c] = new Tile(revealed, goodTile, flagged, clue, elem, color);
         }
     }
-    console.log(board)
 }
 
 function isGoodTile(tile){
@@ -86,7 +90,7 @@ function createBoardElement(row, col, clue){
     // Create HTML element for the tile
     let elem = document.createElement("div");
     elem.id = row.toString() + "-" + col.toString();
-    elem.classList.add("tile", "off");
+    elem.classList.add("tile", "hidden");
     elem.innerText = clue.toString();
     document.getElementById("board").appendChild(elem);
     return elem;
@@ -94,8 +98,8 @@ function createBoardElement(row, col, clue){
 
 function addClickEventsTo(elem, row, col, board){
     // Add left and right click listeners
-    elem.addEventListener("click", () => leftClickManager(row, col, elem, board));
-    elem.addEventListener('contextmenu', (e) => { rightClickManager(e, elem, board); }, false);
+    elem.addEventListener("click", () => leftClickManager(row, col, board));
+    elem.addEventListener('contextmenu', (e) => { rightClickManager(e, row, col, board); }, false);
 }
 
 function getImageColor(image, row, col){
@@ -105,61 +109,85 @@ function getImageColor(image, row, col){
     return rgbToHex(r, g, b);
 }
 
-function leftClickManager(row, col, elem, board){
+function leftClickManager(row, col, board){
     if (board.gameOver) return;
-    flipTile(elem, () => changeColor(elem));
-    changeState(board.grid, row, col);
-    updateScore(board, row, col);
+    let tile = board.grid[row][col];
+    if (tile.flagged) {
+        alert("Flagged tiles cannot be revealed");
+        return;
+    }
+    if (tile.revealed) return;
+    tile.revealed = true;
+    if (tile.goodTile) {
+        board.score++;
+        document.getElementById("score").innerHTML = board.score;
+    }
+    else {
+        board.strikes++;
+        document.getElementById("strikes").innerHTML = board.strikes;
+    }
+    flipTile(tile, () => changeColor(tile));
     checkForGameOver(board);
 }
 
-function rightClickManager(e, elem, board){
+function rightClickManager(e, row, col, board){
     e.preventDefault();
-    if (!board.gameOver)
-        changeMark(elem);
+    if (board.gameOver) return false;
+    let tile = board.grid[row][col];
+    if (tile.revealed) return false;
+    if (tile.flagged) {
+        tile.flagged = false;
+    }
+    else {
+        tile.flagged = true
+    }
+    changeFlag(tile);
     return false;
 }
 
-function flipTile(elem, colorManager){
-    elem.classList.add("flip-in");
+function flipTile(tile, colorManager){
+    tile.elem.classList.add("flip-in");
     setTimeout(() => {  
-        colorManager(elem);
-        elem.classList.remove("flip-in");
-        elem.classList.add("flip-out");
+        colorManager(tile);
+        tile.elem.classList.remove("flip-in");
+        tile.elem.classList.add("flip-out");
     }, 200);
     setTimeout(() => { 
-        elem.classList.remove("flip-out");
+        tile.elem.classList.remove("flip-out");
     }, 400);
 }
 
-function changeColor(elem){
-    if (elem.classList.contains("off")){
-        elem.classList.remove("off");
-        elem.classList.add("on");
-    } 
-    else if (elem.classList.contains("on")){
-        elem.classList.remove("on");
-        elem.classList.add("off");
+function changeColor(tile){
+    if (tile.revealed){
+        tile.elem.classList.remove("hidden");
+        if (tile.goodTile){
+            tile.elem.classList.add("correct");
+        }
+        else {
+            tile.elem.classList.add("wrong");
+        }
     }
 }
 
-function changeState(grid, row, col){
-    grid[row][col].state = !grid[row][col].state;
-}
-
-function updateScore(board, row, col){
-    if (board.grid[row][col].state == board.grid[row][col].correctState){
-        board.score++;
+function changeFlag(tile){
+    if (tile.flagged){
+        tile.elem.classList.add("flagged");
     }
     else {
-        board.score--;
+        tile.elem.classList.remove("flagged");
     }
+    return false;
 }
 
 function checkForGameOver(board){
-    if (board.score == board.targetScore){
+    if (board.score == board.targetScore) {
         board.gameOver = true;
         showBoardColors(board);
+        // alert("GAME CLEARED")
+    }
+    else if (board.strikes == 3) {
+        board.gameOver = true;
+        // alert("GAME OVER");
     }
 }
 
@@ -167,28 +195,86 @@ function showBoardColors(board){
     for (let r = 0; r < board.rows; r++){
         for(let c = 0; c < board.cols; c++){
             setTimeout(() => {
-                let elem = board.grid[r][c].elem;
-                flipTile(elem, () => showTileColor(r, c, elem, board.grid));
-            }, (r+c)*100)
+                let tile = board.grid[r][c];
+                flipTile(tile, () => showTileColor(tile));
+            }, (r*(board.rows-1)+c)*100)
         }
     }
 }
 
-function showTileColor(row, col, elem, grid){
-    let color = grid[row][col].color;
-    elem.innerText = "";
-    elem.classList.remove("on", "off", "marked");
-    let answerStyle = "background-color: " + color + "; border: 1px solid " + color + ";";
-    elem.style = answerStyle;
+function showTileColor(tile){
+    tile.elem.innerText = "";
+    // tile.elem.classList.remove("on", "off", "marked");
+    let answerStyle = "background-color: " + tile.color + "; border: 3px solid " + tile.color + ";";
+    tile.elem.style = answerStyle;
 }
 
-function changeMark(elem){
-    if (elem.classList.contains("marked")){
-        elem.classList.remove("marked")
-    } else {
-        elem.classList.add("marked");
+function activateHelpMode(board) {
+    let R = board.rows-1;
+    let C = board.cols-1;
+
+    for (let r = 0; r < board.rows; r++){
+        for (let c = 0; c < board.cols; c++){
+            if (board.grid[r][c].clue == 3){
+                if ((r==0 && (c==0 || c==C)) || (r==R && (c==0 || c==C))){
+                    revealNeighbours(board, r, c, R, C)
+                }
+            }
+            else if (board.grid[r][c].clue == 5){
+                if (r==0 || r==R || c==0 || c==C){
+                    revealNeighbours(board, r, c, R, C)
+                }
+            }
+            else if (board.grid[r][c].clue == 8){
+                revealNeighbours(board, r, c, R, C)
+            }
+            else if (board.grid[r][c].clue == 0){
+                flagNeighbours(board, r, c, R, C)
+            }
+        }
     }
-    return false;
+
+    let i = 0
+    for (let r = 0; r < board.rows; r++){
+        for (let c = 0; c < board.cols; c++){
+            if (board.grid[r][c].revealed){
+                setTimeout(() => {
+                    flipTile(board.grid[r][c], () => changeColor(board.grid[r][c]));
+                    board.score++;
+                    document.getElementById("score").innerHTML = board.score;
+                }, i*100)
+                i++;
+            }
+            else if (board.grid[r][c].flagged){
+                setTimeout(() => { 
+                    changeFlag(board.grid[r][c]);
+                }, i*100)
+                i++;
+            }
+        }
+    }
+}
+
+function revealNeighbours(board, r, c, R, C){
+    if (r>0 && c>0) { board.grid[r-1][c-1].revealed = true; };
+    if (r>0       ) { board.grid[r-1][c  ].revealed = true; };
+    if (r>0 && c<C) { board.grid[r-1][c+1].revealed = true; };
+    if (       c>0) { board.grid[r  ][c-1].revealed = true; };
+    if (       c<C) { board.grid[r  ][c+1].revealed = true; };
+    if (r<R && c>0) { board.grid[r+1][c-1].revealed = true; };
+    if (r<R       ) { board.grid[r+1][c  ].revealed = true; };
+    if (r<R && c<C) { board.grid[r+1][c+1].revealed = true; };
+}
+
+function flagNeighbours(board, r, c, R, C){
+    if (r>0 && c>0) { board.grid[r-1][c-1].flagged = true; };
+    if (r>0       ) { board.grid[r-1][c  ].flagged = true; };
+    if (r>0 && c<C) { board.grid[r-1][c+1].flagged = true; };
+    if (       c>0) { board.grid[r  ][c-1].flagged = true; };
+    if (       c<C) { board.grid[r  ][c+1].flagged = true; };
+    if (r<R && c>0) { board.grid[r+1][c-1].flagged = true; };
+    if (r<R       ) { board.grid[r+1][c  ].flagged = true; };
+    if (r<R && c<C) { board.grid[r+1][c+1].flagged = true; };
 }
 
 function rgbToHex(r, g, b) {

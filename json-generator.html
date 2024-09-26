@@ -9,11 +9,30 @@
 
 <h1>Image to 2D RGB JSON Converter</h1>
 
-<!-- Button to open file explorer -->
-<input type="file" id="imageInput" accept="image/*">
+<!-- Additional Fields -->
+<label for="numberInput">Number:</label>
+<input type="number" id="numberInput">
 <br><br>
 
-<!-- Button to process the image and download JSON -->
+<label for="titleInput">Title:</label>
+<input type="text" id="titleInput">
+<br><br>
+
+<label for="subtitleInput">Subtitle:</label>
+<input type="text" id="subtitleInput">
+<br><br>
+
+<!-- First Image Input (for "pixels") -->
+<h3>Image 1 (to be stored as "pixels")</h3>
+<input type="file" id="imageInput1" accept="image/*">
+<br><br>
+
+<!-- Second Image Input (for "colors") -->
+<h3>Image 2 (to be stored as "colors")</h3>
+<input type="file" id="imageInput2" accept="image/*">
+<br><br>
+
+<!-- Button to process both images and download JSON -->
 <button id="processButton" disabled>Convert and Download JSON</button>
 
 <!-- Hidden canvas element for pixel manipulation -->
@@ -21,56 +40,101 @@
 
 <script>
   // Get DOM elements
-  const imageInput = document.getElementById('imageInput');
+  const numberInput = document.getElementById('numberInput');
+  const titleInput = document.getElementById('titleInput');
+  const subtitleInput = document.getElementById('subtitleInput');
+  const imageInput1 = document.getElementById('imageInput1');
+  const imageInput2 = document.getElementById('imageInput2');
   const processButton = document.getElementById('processButton');
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
-  let selectedImage = null;
+  let selectedImage1 = null;
+  let selectedImage2 = null;
 
-  // Event listener for image selection
-  imageInput.addEventListener('change', function(event) {
+  // Event listener for first image selection
+  imageInput1.addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
-      selectedImage = new Image();
-      selectedImage.src = URL.createObjectURL(file);
-      selectedImage.onload = function() {
-        // Enable the process button once an image is loaded
-        processButton.disabled = false;
+      selectedImage1 = new Image();
+      selectedImage1.src = URL.createObjectURL(file);
+      selectedImage1.onload = function() {
+        checkImagesLoaded();
       };
     }
   });
 
-  // Event listener for processing the image and downloading JSON
-  processButton.addEventListener('click', function() {
-    if (selectedImage) {
-      // Set canvas size to match the image dimensions
-      canvas.width = selectedImage.width;
-      canvas.height = selectedImage.height;
-      ctx.drawImage(selectedImage, 0, 0);
+  // Event listener for second image selection
+  imageInput2.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      selectedImage2 = new Image();
+      selectedImage2.src = URL.createObjectURL(file);
+      selectedImage2.onload = function() {
+        checkImagesLoaded();
+      };
+    }
+  });
 
-      // Get image data (RGBA values)
-      const imageData = ctx.getImageData(0, 0, selectedImage.width, selectedImage.height);
-      const pixels = imageData.data;
+  // Function to check if both images are loaded and enable the button
+  function checkImagesLoaded() {
+    if (selectedImage1 && selectedImage2) {
+      processButton.disabled = false;
+    }
+  }
+
+  // Function to get RGB values from an image
+  function getRGBValues(image) {
+    // Set canvas size to match the image dimensions
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+
+    // Get image data (RGBA values)
+    const imageData = ctx.getImageData(0, 0, image.width, image.height);
+    const pixels = imageData.data;
+
+    // Build the 2D array of RGB values
+    const rgbArray = [];
+    for (let y = 0; y < image.height; y++) {
+      const row = [];
+      for (let x = 0; x < image.width; x++) {
+        const index = (y * image.width + x) * 4;
+        const r = pixels[index];
+        const g = pixels[index + 1];
+        const b = pixels[index + 2];
+        row.push([r, g, b]); // Push [R, G, B] values for each pixel
+      }
+      rgbArray.push(row);
+    }
+    return rgbArray;
+  }
+
+  // Event listener for processing both images and downloading JSON
+  processButton.addEventListener('click', function() {
+    if (selectedImage1 && selectedImage2) {
+      // Get user inputs for number, title, and subtitle
+      const number = parseInt(numberInput.value) || 0;
+      const title = titleInput.value || 'Untitled';
+      const subtitle = subtitleInput.value || 'No subtitle';
+
+      // Get the width and height of the images (both images have the same dimensions)
+      const width = selectedImage1.width;
+      const height = selectedImage1.height;
+
+      // Get RGB values for both images
+      const pixels = getRGBValues(selectedImage1); // First image's RGB values
+      const colors = getRGBValues(selectedImage2); // Second image's RGB values
 
       // Build the JSON object
       const jsonImage = {
-        width: selectedImage.width,
-        height: selectedImage.height,
-        pixels: []
+        number: number,          // Store the number
+        title: title,            // Store the title
+        subtitle: subtitle,      // Store the subtitle
+        width: width,            // Store the image width
+        height: height,          // Store the image height
+        pixels: pixels,          // Store the 2D array of RGB for the first image
+        colors: colors           // Store the 2D array of RGB for the second image
       };
-
-      // Iterate through rows and columns to create the 2D matrix
-      for (let y = 0; y < selectedImage.height; y++) {
-        const row = [];
-        for (let x = 0; x < selectedImage.width; x++) {
-          const index = (y * selectedImage.width + x) * 4;
-          const r = pixels[index];
-          const g = pixels[index + 1];
-          const b = pixels[index + 2];
-          row.push([r, g, b]); // Push [R, G, B] values for each pixel
-        }
-        jsonImage.pixels.push(row); // Add each row to the pixels array
-      }
 
       // Create a JSON blob and trigger download
       const blob = new Blob([JSON.stringify(jsonImage)], { type: 'application/json' });
