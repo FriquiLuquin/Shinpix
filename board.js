@@ -33,6 +33,7 @@ function loadPuzzle(puzzleData) {
     document.getElementById("subtitle").innerHTML = puzzleData.subtitle;
     var grid = createEmptyGrid(puzzleData.height, puzzleData.width);
     var board = new Board(puzzleData.height, puzzleData.width, puzzleData.pixels, puzzleData.colors, grid);
+    createTiles(board);
     populateBoard(board);
     document.getElementById("goal").innerHTML = board.targetScore;
     console.log(board)
@@ -47,7 +48,7 @@ function createEmptyGrid(rows, cols){
     return arr;
 }
 
-function populateBoard(board){
+function createTiles(board){
     for (let r = 0; r < board.rows; r++){
         for(let c = 0; c < board.cols; c++){
             let revealed = false;
@@ -57,11 +58,8 @@ function populateBoard(board){
                 board.targetScore++;
             }
             let flagged = false;
-            let clue = calculateTileClue(board.image, r, c, board.rows, board.cols);
-            let elem = createBoardElement(r, c, clue);
-            addClickEventsTo(elem, r, c, board);
             let color = getImageColor(board.colorImage, r, c);
-            board.grid[r][c] = new Tile(revealed, goodTile, flagged, clue, elem, color);
+            board.grid[r][c] = new Tile(revealed, goodTile, flagged, color);
         }
     }
 }
@@ -70,19 +68,50 @@ function isGoodTile(tile){
     return tile[0] == 0 && tile[1] == 0 && tile[2] == 0
 }
 
-function calculateTileClue(image, r, c, rows, cols){
+function getImageColor(image, row, col){
+    let r = image[row][col][0];
+    let g = image[row][col][1];
+    let b = image[row][col][2];
+    return rgbToHex(r, g, b);
+}
+
+function populateBoard(board){
+    for (let r = 0; r < board.rows; r++){
+        for(let c = 0; c < board.cols; c++){
+            let tile = board.grid[r][c];
+            let neighbours = calculateNeighbours(board.grid, r, c, board.rows, board.cols);
+            let clue = calculateTileClue(neighbours);
+            let elem = createBoardElement(r, c, clue);
+            addClickEventsTo(elem, r, c, board);
+            tile.elem = elem;
+            tile.clue = clue;
+            tile.neighbours = neighbours;
+            tile.numNeighbours = neighbours.length;
+            tile.numRevealedNeighbours = 0;
+        }
+    }
+}
+
+function calculateNeighbours(grid, r, c, rows, cols) {
     let R = rows-1;
     let C = cols-1;
+    let neighbours = [];
+    if (r>0 && c>0) { neighbours.push(grid[r-1][c-1]) };
+    if (r>0       ) { neighbours.push(grid[r-1][c  ]) };
+    if (r>0 && c<C) { neighbours.push(grid[r-1][c+1]) };
+    if (       c>0) { neighbours.push(grid[r  ][c-1]) };
+    if (       c<C) { neighbours.push(grid[r  ][c+1]) };
+    if (r<R && c>0) { neighbours.push(grid[r+1][c-1]) };
+    if (r<R       ) { neighbours.push(grid[r+1][c  ]) };
+    if (r<R && c<C) { neighbours.push(grid[r+1][c+1]) };
+    return neighbours;
+}
+
+function calculateTileClue(neighbours){
     let clue = 0;
-    // Count neighbours that must be revealed
-    if (r>0 && c>0 && isGoodTile(image[r-1][c-1])) { clue++; };
-    if (r>0        && isGoodTile(image[r-1][c  ])) { clue++; };
-    if (r>0 && c<C && isGoodTile(image[r-1][c+1])) { clue++; };
-    if (       c>0 && isGoodTile(image[r  ][c-1])) { clue++; };
-    if (       c<C && isGoodTile(image[r  ][c+1])) { clue++; };
-    if (r<R && c>0 && isGoodTile(image[r+1][c-1])) { clue++; };
-    if (r<R        && isGoodTile(image[r+1][c  ])) { clue++; };
-    if (r<R && c<C && isGoodTile(image[r+1][c+1])) { clue++; };
+    for (let i = 0; i < neighbours.length; i++){
+        if (neighbours[i].goodTile) { clue++ }
+    }
     return clue;
 }
 
@@ -100,13 +129,6 @@ function addClickEventsTo(elem, row, col, board){
     // Add left and right click listeners
     elem.addEventListener("click", () => leftClickManager(row, col, board));
     elem.addEventListener('contextmenu', (e) => { rightClickManager(e, row, col, board); }, false);
-}
-
-function getImageColor(image, row, col){
-    let r = image[row][col][0];
-    let g = image[row][col][1];
-    let b = image[row][col][2];
-    return rgbToHex(r, g, b);
 }
 
 function leftClickManager(row, col, board){
@@ -197,7 +219,7 @@ function showBoardColors(board){
             setTimeout(() => {
                 let tile = board.grid[r][c];
                 flipTile(tile, () => showTileColor(tile));
-            }, (r*(board.rows-1)+c)*100)
+            }, (c*100)) //(r*(board.rows-1)+c)*100)
         }
     }
 }
@@ -212,69 +234,39 @@ function showTileColor(tile){
 function activateHelpMode(board) {
     let R = board.rows-1;
     let C = board.cols-1;
-
     for (let r = 0; r < board.rows; r++){
         for (let c = 0; c < board.cols; c++){
-            if (board.grid[r][c].clue == 3){
-                if ((r==0 && (c==0 || c==C)) || (r==R && (c==0 || c==C))){
-                    revealNeighbours(board, r, c, R, C)
-                }
+            let tile = board.grid[r][c];
+            if ((tile.clue == 3 && tile.numNeighbours == 3) ||
+                (tile.clue == 5 && tile.numNeighbours == 5) ||
+                (tile.clue == 8)){
+                revealNeighbours(tile, board)
             }
-            else if (board.grid[r][c].clue == 5){
-                if (r==0 || r==R || c==0 || c==C){
-                    revealNeighbours(board, r, c, R, C)
-                }
-            }
-            else if (board.grid[r][c].clue == 8){
-                revealNeighbours(board, r, c, R, C)
-            }
-            else if (board.grid[r][c].clue == 0){
-                flagNeighbours(board, r, c, R, C)
-            }
-        }
-    }
-
-    let i = 0
-    for (let r = 0; r < board.rows; r++){
-        for (let c = 0; c < board.cols; c++){
-            if (board.grid[r][c].revealed){
-                setTimeout(() => {
-                    flipTile(board.grid[r][c], () => changeColor(board.grid[r][c]));
-                    board.score++;
-                    document.getElementById("score").innerHTML = board.score;
-                }, i*100)
-                i++;
-            }
-            else if (board.grid[r][c].flagged){
-                setTimeout(() => { 
-                    changeFlag(board.grid[r][c]);
-                }, i*100)
-                i++;
+            else if (tile.clue == 0){
+                flagNeighbours(tile, board)
             }
         }
     }
 }
 
-function revealNeighbours(board, r, c, R, C){
-    if (r>0 && c>0) { board.grid[r-1][c-1].revealed = true; };
-    if (r>0       ) { board.grid[r-1][c  ].revealed = true; };
-    if (r>0 && c<C) { board.grid[r-1][c+1].revealed = true; };
-    if (       c>0) { board.grid[r  ][c-1].revealed = true; };
-    if (       c<C) { board.grid[r  ][c+1].revealed = true; };
-    if (r<R && c>0) { board.grid[r+1][c-1].revealed = true; };
-    if (r<R       ) { board.grid[r+1][c  ].revealed = true; };
-    if (r<R && c<C) { board.grid[r+1][c+1].revealed = true; };
+function revealNeighbours(tile, board){
+    for (let i = 0; i < tile.numNeighbours; i++){
+        if (tile.neighbours[i].revealed == false){
+            tile.neighbours[i].revealed = true;
+            flipTile(tile.neighbours[i], () => changeColor(tile.neighbours[i]));
+            board.score++;
+            document.getElementById("score").innerHTML = board.score;
+        }
+    }
 }
 
-function flagNeighbours(board, r, c, R, C){
-    if (r>0 && c>0) { board.grid[r-1][c-1].flagged = true; };
-    if (r>0       ) { board.grid[r-1][c  ].flagged = true; };
-    if (r>0 && c<C) { board.grid[r-1][c+1].flagged = true; };
-    if (       c>0) { board.grid[r  ][c-1].flagged = true; };
-    if (       c<C) { board.grid[r  ][c+1].flagged = true; };
-    if (r<R && c>0) { board.grid[r+1][c-1].flagged = true; };
-    if (r<R       ) { board.grid[r+1][c  ].flagged = true; };
-    if (r<R && c<C) { board.grid[r+1][c+1].flagged = true; };
+function flagNeighbours(tile, board){
+    for (let i = 0; i < tile.numNeighbours; i++){
+        if (tile.neighbours[i].flagged == false){
+            tile.neighbours[i].flagged = true;
+            changeFlag(tile.neighbours[i]);
+        }
+    }
 }
 
 function rgbToHex(r, g, b) {
